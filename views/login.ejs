@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+	<main>
+		<form action="/login" method="POST" class="col-sm-8 mb-5">
+			<div class="form-group">
+				<label for="username">ユーザーID</label>
+				<input type="text" name="username" id="username" class="form-control" placeholder="メールアドレスを入力" value="kinako@gmail.com">
+			</div>
+			<div class="form-group">
+				<label for="password">パスワード</label>
+				<input type="text" name="password" id="password" class="form-control" placeholder="パスワードを入力" value="123456">
+			</div>
+			<button type="submit" class="btn btn-lg btn-primary">ログイン</button>
+		</form>
+		<section class="col-sm-6">
+			<p>SNSでログイン</p>
+			<div class="card social-block mb-1">
+				<div class="card-body">
+					<a class="btn btn-block btn-lg btn-social btn-google" href="/auth/google" role="button">
+						<i class="fab fa-google btn-social_icon"></i>
+						Sign In with Google
+					</a>
+				</div>
+			</div>
+			<div class="card social-block">
+				<div class="card-body">
+					<a class="btn btn-block btn-lg btn-social btn-facebook" href="/auth/facebook" role="button">
+						<i class="fab fa-facebook btn-social_icon"></i>
+						Sign In with Facebook
+					</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+
+	<%- include('partials/footer') %>

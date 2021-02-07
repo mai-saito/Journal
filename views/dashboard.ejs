@@ -1,0 +1,40 @@
+<%- include('partials/dashboard-header') %>
+
+	<main>
+		<a href="/compose" id="new-post" class="btn btn-outline-primary btn-lg mb-5">あたらしい記事を書く</a>
+		<section class="published-list mb-5">
+			<!-- Need lists of published posts(title) with edit/delete button on the side -->
+			<h1>掲載済みの記事</h1>
+			<ul class="list-group">
+				<% for (let i=0; i < user.posts.length; i++) { %>
+					<li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+						<a href="/posts/<%= user.posts[i].title %> ">
+							<%= user.posts[i].title %>
+						</a>
+						<div>
+							<a href="/edit/<%= user.posts[i].title %>" type="button" class="btn btn-outline-primary">修正する</a>
+							<a href="/delete/<%= user.posts[i].title %>" type="button" class="btn btn-outline-primary">削除する</a>
+						</div>
+					</li>
+					<% } %>
+			</ul>
+		</section>
+		<section class="draft-list">
+			<!-- publish should be on the compose page, so no need for buttons here. Just set the link on titles to compose page -->
+			<h1>保存している記事</h1>
+			<div class="list-group">
+				<% for (let i=0; i < user.drafts.length; i++) { %>
+					<li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+						<a href="/edit/<%= user.drafts[i].title %>">
+							<%= user.drafts[i].title %>
+						</a>
+						<a href="/edit/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-primary">編集する</a>
+					</li>
+					<% } %>
+			</div>
+		</section>
+	</main>
+
+
+
+	<%- include('partials/footer') %>

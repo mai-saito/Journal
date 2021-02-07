@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+
+	<main>
+		<section class="row ml-0">
+			<% posts.forEach(function(post) { %>
+				<% if (post.published === true) { %>
+					<section class="col-sm-4 col-lg-3 mb-4">
+						<div class="card">
+							<div class="card-body">
+								<h1 class="card-title">
+									<a href="/posts/<%= post.title %>">
+										<%= post.title %>
+									</a>
+								</h1>
+								<p class="card-text">
+									<%= post.content.substring(0, 100) %>
+								</p>
+								<a href="/posts/<%= post.title %>" class="btn btn-outline-primary">記事を読む</a>
+								<div class="media mt-3">
+									<img src="#" alt="" class="mr-3">
+									<a href="/authors/<%= post.author %>" class="card-link media-body author">
+										<%= post.author %>
+									</a>
+								</div>
+							</div>
+						</div>
+					</section>
+					<% } %>
+						<% }); %>
+		</section>
+	</main>
+
+	<%- include('partials/footer') %>

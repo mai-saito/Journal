@@ -1,0 +1,111 @@
+@charset "utf-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 62.5%;
+}
+
+body {
+	font: 1.6rem 'M PLUS Rounded 1c', sans-serif;
+}
+
+#wrapper {
+	height: 100vh;
+	/* padding-top: 70px; */
+	background: rgb(245, 245, 245);
+}
+
+li {
+	list-style: none;
+}
+
+a {
+	color: rgb(48, 52, 129);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+	color: rgb(214, 230, 242);
+}
+
+/* Header */
+header {
+	width: 100vw;
+	padding: 10px 20px;
+	margin-bottom: 30px;
+	display: flex;
+	align-items: center;
+	background: rgb(245, 245, 245);
+}
+
+header h1>a{
+	font-size: 3rem;
+	font-weight: bold;
+}
+
+header ul {
+	display: flex;
+}
+
+header a {
+	color: rgb(48, 52, 129);
+}
+
+header nav a {
+	padding: 0 5px;
+}
+
+header nav {
+	justify-content: flex-end;
+}
+
+/* Main */
+main {
+	display: block;
+	padding: 0 5%;
+}
+
+main .author {
+	color: rgb(83, 85, 129);
+} 
+
+main .author:hover{
+	text-decoration: none;
+	color: rgb(214, 230, 242);
+} 
+
+main .btn-social_icon:before {
+	position: absolute;
+	top: -8px;
+	left: 6px;
+}
+
+main section div .card-body {
+	padding: 0.5rem;
+}
+
+/* #new-post {
+	width: 30%;
+	display: block;
+	position: relative;
+	left: 5%;
+} */
+
+/* Footer */
+footer {
+	height: 50px;
+	width: 100vw;
+	position: absolute;
+	bottom: 0;
+	background-color: rgb(214, 230, 242);
+}
+
+footer a {
+	color: rgb(255, 255, 255);
+}

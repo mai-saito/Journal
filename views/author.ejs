@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+
+	<main>
+		<h1>
+			<%= authorName %>
+		</h1>
+		<section class="row">
+			<% posts.forEach(function(post) { %>
+				<section class="col-sm-4 col-lg-3">
+					<div class="card">
+						<div class="card-body">
+							<h1 class="card-title">
+								<%= post.title %>
+							</h1>
+							<p class="card-text">
+								<%= post.content.substring(0, 100) %>
+							</p>
+							<a href="/posts/<%= post.title %>" class="btn btn-primary">記事を読む</a>
+						</div>
+					</div>
+				</section>
+				<% }) %>
+		</section>
+	</main>
+
+	<%- include('partials/footer') %>
