@@ -11,6 +11,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
 const app = express();
+const Schema = mongoose.Schema
 
 app.use(express.static('public'));
 app.use(session({
@@ -30,27 +31,35 @@ mongoose.connect('mongodb://localhost:27017/journalDB', {
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
-const postSchema = new mongoose.Schema({
+const postSchema = Schema({
 	title: String,
 	content: String,
-	author: String,
+	author: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
 	published: Boolean
 });
 
-const Post = mongoose.model('Post', postSchema);
-
-const userSchema = new mongoose.Schema({
+const userSchema = Schema({
 	username: String,
 	password: String,
 	displayName: String,
 	provider: String,
-	posts: [postSchema],
-	drafts: [postSchema]
+	posts: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Post'
+	}],
+	drafts: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Post'
+	}]
 });
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
+const Post = mongoose.model('Post', postSchema);
 const User = mongoose.model('User', userSchema);
 
 passport.use(new GoogleStrategy({
@@ -102,13 +111,15 @@ passport.deserializeUser(function (id, done) {
 });
 
 app.get('/', function (req, res) {
-	Post.find({}, function (error, posts) {
-		if (error) {
-			console.log(error);
-		} else {
-			res.render('home', { posts: posts });
-		}
-	});
+	Post.find()
+		.populate('author')
+		.exec(function (error, posts) {
+			if (error) {
+				console.log(error);
+			} else {
+				res.render('home', { posts: posts });
+			}
+		});
 });
 
 app.get('/about', function (req, res) {
@@ -164,64 +175,62 @@ app.get('/compose', function (req, res) {
 
 app.get('/edit/:title', function (req, res) {
 	if (req.isAuthenticated()) {
-		Post.findOne({ title: req.params.title }, function (error, post) {
-			if (error) {
-				console.log(error);
-			} else {
-				if (post) {
-					res.render('edit', { post: post });
+		Post.findOne({ title: req.params.title })
+			.populate('author')
+			.exec(function (error, post) {
+				if (error) {
+					console.log(error);
 				} else {
-					res.render('edit', { post: post });
+					if (post) {
+						res.render('edit', { post: post });
+					} else {
+						res.redirect('/dashboard');
+					}
 				}
-			}
-		})
-	} else {
-		res.redirect('/login');
+			});
 	}
 });
 
 app.get('/posts/:title', function (req, res) {
-	Post.findOne({ title: req.params.title }, function (error, post) {
-		if (error) {
-			console.log(error);
-		} else {
-			if (post) {
-				res.render('post', { post: post });
+	Post.findOne({ title: req.params.title })
+		.populate('author')
+		.exec(function (error, post) {
+			if (error) {
+				console.log(error);
 			} else {
-				res.redirect('/');
+				if (post) {
+					res.render('post', { post: post });
+				} else {
+					res.redirect('/');
+				}
 			}
-		}
-	});
+		});
 });
 
 app.get('/authors/:author', function (req, res) {
-	User.findOne({ displayName: req.params.author }, function (error, user) {
-		if (error) {
-			console.log(error);
-		} else {
-			if (user) {
-				res.render('author', { authorName: user.displayName, posts: user.posts });
+	User.findOne({ displayName: req.params.author })
+		.populate('posts')
+		.exec(function (error, author) {
+			if (error) {
+				console.log(error);
 			} else {
-				res.redirect('/');
+				if (author) {
+					res.render('author', { author: author });
+				} else {
+					res.redirect('/');
+				}
 			}
-		}
-	});
+		});
 });
 
 app.get('/dashboard', function (req, res) {
 	if (req.isAuthenticated()) {
-
-		User.findOne({ _id: req.user.id }, function (error, user) {
-			if (error) {
-				console.log(error);
-			} else {
-				if (user) {
-					res.render('dashboard', { user: user });
-				} else {
-					res.redirect('/login')
-				}
-			}
-		})
+		User.findOne({ _id: req.user.id })
+			.populate('posts')
+			.populate('drafts')
+			.exec(function (error, user) {
+				res.render('dashboard', { user: user });
+			});
 	}
 });
 
@@ -240,7 +249,7 @@ app.post('/login', function (req, res) {
 					res.redirect('/dashboard');
 				});
 			} else {
-				console.log('No match')
+				console.log('No match');
 				res.redirect('/login');
 			}
 		}
@@ -248,7 +257,6 @@ app.post('/login', function (req, res) {
 });
 
 app.post('/register', function (req, res) {
-
 	User.register({ username: req.body.username, displayName: req.body.name }, req.body.password, function (error, user) {
 		if (error) {
 			console.log(error);
@@ -265,72 +273,78 @@ app.post('/register', function (req, res) {
 });
 
 app.post('/compose', function (req, res) {
-
-	const post = new Post({
-		title: req.body.title,
-		content: req.body.content,
-		author: req.user.displayName,
-		published: true
-	});
-
-	const draft = new Post({
-		title: req.body.title,
-		content: req.body.content,
-		author: req.user.displayName,
-		published: false
-	});
-
+	// when user pressed publish (投稿する) button to publish posts
 	if (req.body.publish) {
-		User.findOneAndUpdate({ _id: req.user.id }, { $push: { posts: post } }, function (error) {
-			if (error) {
-				console.log(error);
-			} else {
-				post.save();
-				res.redirect('/dashboard');
-			}
+		const post = new Post({
+			title: req.body.title,
+			content: req.body.content,
+			author: req.user,
+			published: true
 		});
-	} else if (req.body.save) {
-		User.findOneAndUpdate({ _id: req.user.id }, { $push: { drafts: draft } }, function (error, user) {
-			if (error) {
-				console.log(error);
-			} else {
-				if (user) {
-					draft.save()
-					res.redirect('/dashboard')
+		post.save().then(function (post) {
+			User.findOneAndUpdate({ _id: post.author }, { $push: { posts: post } }, function (error) {
+				if (error) {
+					console.log(error);
+				} else {
+					res.redirect('/dashboard');
 				}
-			}
+			})
+		}).catch(function (error) {
+			console.log(error);
+		});
+	// when user pressed save (保存する) button to save drafts
+	} else if (req.body.save) {
+		const draft = new Post({
+			title: req.body.title,
+			content: req.body.content,
+			author: req.user,
+			published: false
+		});
+		draft.save().then(function (draft) {
+			User.findOneAndUpdate({ _id: draft.author }, { $push: { drafts: draft } }, function (error) {
+				if (error) {
+					console.log(error);
+				} else {
+					res.redirect('/dashboard');
+				}
+			});
+		}).catch(function (error) {
+			console.log(error);
 		});
 	}
 });
 
 app.post('/edit/:title', function (req, res) {
-	console.log(req.params.title)
 	if (req.body.publish) {
 		Post.findOneAndUpdate({ title: req.params.title }, {
 			title: req.body.title,
 			content: req.body.content,
 			published: true
-		}, function (error, post) {
-			if (error) {
+		}).then(function (post) {
+				User.findOneAndUpdate({ _id: req.user.id }, { 
+					$pull: { drafts: post.id },
+					$push: { posts: post.id } 
+				})
+				.then(function() {
+					res.redirect('/dashboard');
+				})
+			}).catch(function (error) {
 				console.log(error);
-			} else {
-				res.redirect('/dashboard');
-			}
-		});
-		
-	} else if (req.body.save) {
-		Post.findOneAndUpdate({ title: req.params.title }, {
-			title: req.body.title,
-			content: req.body.content,
-			published: false
-		}, function (error, post) {
-			if (error) {
-				console.log(error);
-			} else {
-				res.redirect('/dashboard');
-			}
-		});
-	}
+			});
+
+ } else if (req.body.save) {
+	Post.findOneAndUpdate({ title: req.params.title }, {
+		title: req.body.title,
+		content: req.body.content,
+		published: false
+	}, function (error, post) {
+		if (error) {
+			console.log(error);
+		} else {
+			res.redirect('/dashboard');
+		}
+	});
+}
 });
 
 app.post('/search', function (req, res) {

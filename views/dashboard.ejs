@@ -13,7 +13,7 @@
 						</a>
 						<div>
 							<a href="/edit/<%= user.posts[i].title %>" type="button" class="btn btn-outline-primary">修正する</a>
-							<a href="/delete/<%= user.posts[i].title %>" type="button" class="btn btn-outline-primary">削除する</a>
+							<a href="/delete/posts/<%= user.posts[i].title %>" type="button" class="btn btn-outline-danger">削除する</a>
 						</div>
 					</li>
 					<% } %>
@@ -28,7 +28,10 @@
 						<a href="/edit/<%= user.drafts[i].title %>">
 							<%= user.drafts[i].title %>
 						</a>
-						<a href="/edit/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-primary">編集する</a>
+						<div>
+							<a href="/edit/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-primary">編集する</a>
+							<a href="/delete/drafts/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-danger">削除する</a>
+						</div>
 					</li>
 					<% } %>
 			</div>
