@@ -361,6 +361,38 @@ app.post('/search', function (req, res) {
 	});
 });
 
+app.delete('/delete/posts/:title', function(req, res) {
+	Post.findOneAndDelete({title: req.params.title}).
+		then(function(post) {
+			User.findOneAndUpdate({_id: req.user.id}, {$pull: {posts: post.id}})
+				.then(function() {
+					res.json({success: true});
+				})
+				.catch(function(error) {
+					console.log(error);
+					res.json({error: error});
+				})
+		}).catch(function(error) {
+			console.log(error);
+		});
+});
+
+app.delete('/delete/drafts/:title', function(req, res) {
+	Post.findOneAndDelete({title: req.params.title}).
+		then(function(draft) {
+			User.findOneAndUpdate({_id: req.user.id}, {$pull: {drafts: draft.id}})
+				.then(function() {
+					res.json({success: true});
+				})
+				.catch(function(error) {
+					console.log(error);
+					res.json({error: error});
+				})
+		}).catch(function(error) {
+			console.log(error);
+		});
+});
+
 app.listen(3000, function () {
 	console.log('Successfully listening to port 3000');
 });

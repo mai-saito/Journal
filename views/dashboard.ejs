@@ -11,9 +11,12 @@
 						<a href="/posts/<%= user.posts[i].title %> ">
 							<%= user.posts[i].title %>
 						</a>
-						<div>
-							<a href="/edit/<%= user.posts[i].title %>" type="button" class="btn btn-outline-primary">修正する</a>
-							<a href="/delete/posts/<%= user.posts[i].title %>" type="button" class="btn btn-outline-danger">削除する</a>
+						<div class="row mr-0">
+							<a href="/edit/<%= user.posts[i].title %>" type="button" class="col mr-2 btn btn-outline-primary">修正する</a>
+							<form class="form-inline">
+								<button type="submit" class="delete col btn btn-outline-danger" name="posts"
+									value="<%= user.posts[i].title %>">削除する</button>
+							</form>
 						</div>
 					</li>
 					<% } %>
@@ -28,16 +31,61 @@
 						<a href="/edit/<%= user.drafts[i].title %>">
 							<%= user.drafts[i].title %>
 						</a>
-						<div>
-							<a href="/edit/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-primary">編集する</a>
-							<a href="/delete/drafts/<%= user.drafts[i].title %>" type="button" class="btn btn-outline-danger">削除する</a>
+						<div class="row mr-0">
+							<a href="/edit/<%= user.drafts[i].title %>" type="button"
+								class="col mr-2 btn btn-outline-primary">編集する</a>
+							<form>
+								<button type="submit" class="delete col btn btn-outline-danger" name="drafts"
+									value="<%= user.drafts[i].title %>">削除する</button>
+							</form>
 						</div>
 					</li>
 					<% } %>
 			</div>
 		</section>
 	</main>
+	<footer>
+		<section>
+			<a href="#"><i class="fab fa-github"></i></a>
+			<a href="#"><i class="fab fa-linkedin-in"></i></a>
+		</section>
+	</footer>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>
+		$(function () {
+			$('.delete').on('click', function (event) {
+				event.preventDefault();
+				if (event.target.name == 'posts') {
+					let post = event.target.value;
+					$.ajax({
+						type: 'DELETE',
+						url: '/delete/posts/' + post,
+						success: function (post) {
+							window.location.reload();
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				}
 
+				if (event.target.name == 'drafts') {
+					let draft = event.target.value;
+					$.ajax({
+						type: 'DELETE',
+						url: '/delete/drafts/' + draft,
+						success: function (draft) {
+							window.location.reload();
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				}
+			});
+		});
+	</script>
+	</body>
 
-
-	<%- include('partials/footer') %>
+	</html>
