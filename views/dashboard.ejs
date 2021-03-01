@@ -12,11 +12,8 @@
 							<%= user.posts[i].title %>
 						</a>
 						<div class="row mr-0">
-							<a href="/edit/<%= user.posts[i].title %>" type="button" class="col mr-2 btn btn-outline-primary">修正する</a>
-							<form class="form-inline">
-								<button type="submit" class="delete col btn btn-outline-danger" name="posts"
-									value="<%= user.posts[i].title %>">削除する</button>
-							</form>
+							<a href="/edit/posts/<%= user.posts[i].title %>" type="button" class="col mr-2 btn btn-outline-primary">修正する</a>
+							<button type="submit" class="delete col btn btn-outline-danger" name="posts" value="<%= user.posts[i].title %>">削除する</button>
 						</div>
 					</li>
 					<% } %>
@@ -28,16 +25,12 @@
 			<div class="list-group">
 				<% for (let i=0; i < user.drafts.length; i++) { %>
 					<li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-						<a href="/edit/<%= user.drafts[i].title %>">
+						<a href="/edit/drafts/<%= user.drafts[i].title %>">
 							<%= user.drafts[i].title %>
 						</a>
 						<div class="row mr-0">
-							<a href="/edit/<%= user.drafts[i].title %>" type="button"
-								class="col mr-2 btn btn-outline-primary">編集する</a>
-							<form>
-								<button type="submit" class="delete col btn btn-outline-danger" name="drafts"
-									value="<%= user.drafts[i].title %>">削除する</button>
-							</form>
+							<a href="/edit/drafts/<%= user.drafts[i].title %>" type="button" class="col mr-2 btn btn-outline-primary">編集する</a>
+							<button type="submit" class="delete col btn btn-outline-danger" name="drafts" value="<%= user.drafts[i].title %>">削除する</button>
 						</div>
 					</li>
 					<% } %>
@@ -61,7 +54,7 @@
 					$.ajax({
 						type: 'DELETE',
 						url: '/delete/posts/' + post,
-						success: function (post) {
+						success: function () {
 							window.location.reload();
 						},
 						error: function (error) {
@@ -75,7 +68,7 @@
 					$.ajax({
 						type: 'DELETE',
 						url: '/delete/drafts/' + draft,
-						success: function (draft) {
+						success: function () {
 							window.location.reload();
 						},
 						error: function (error) {

@@ -1,0 +1,24 @@
+<%- include('partials/header.ejs') %>
+
+		<main>
+				<p>アカウントを削除いたしました。またのご利用をお待ちしております。</p>
+				<p>（5秒後に自動的にホーム画面へ切り替わります。）</p>
+				
+		</main>
+		<footer>
+			<section>
+				<a href="#"><i class="fab fa-github"></i></a>
+				<a href="#"><i  class="fab fa-linkedin-in"></i></a>
+			</section>
+		</footer>
+	</div>
+	<script>
+		window.onload = function() {
+			setTimeout(function() {
+				window.location.href = '/'
+			}, 5000);
+		}
+	</script>
+</body>
+
+</html>

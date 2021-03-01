@@ -1,9 +1,20 @@
 <%- include('partials/header') %>
 
-<main>
-	<h1><%= post.title %></h1>
-	<p><%= post.author.displayName %></p>
-	<p><%= post.content %></p>
-</main>
+	<main class="post">
+		<div class="image-container mb-5"><img src="uploads/<%= post.image %>" alt="eye catch picture" class="img-thumbnail"></div>
+		<h1 class="mb-1"><%= post.title %></h1>
+		<div class="media mb-5">
+			<a href="/authors/<%= post.author.displayName %>" class="mr-3">
+				<p class="mr-1 mb-2"><img src="uploads/<%= post.author.avatar %>" class="circled-image" alt=""></p>
+			</a>
+			<div>
+				<a href="/authors/<%= post.author.displayName %>">
+					<p class="mb-0"><%= post.author.displayName %></p>
+				</a>
+				<p class="mb-0"><%= post.created %></p>
+			</div>
+		</div>
+		<p><%= post.content %></p>
+	</main>
 
-<%- include('partials/footer') %>
+	<%- include('partials/footer') %>

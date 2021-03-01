@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const multer = require('multer');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const session = require('express-session');
@@ -11,7 +12,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
 const app = express();
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
+const upload = multer({ dest: 'public/uploads/' });
 
 app.use(express.static('public'));
 app.use(session({
@@ -38,6 +40,8 @@ const postSchema = Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'User'
 	},
+	image: String,
+	created: String,
 	published: Boolean
 });
 
@@ -45,6 +49,7 @@ const userSchema = Schema({
 	username: String,
 	password: String,
 	displayName: String,
+	avatar: String,
 	provider: String,
 	posts: [{
 		type: Schema.Types.ObjectId,
@@ -61,6 +66,16 @@ userSchema.plugin(findOrCreate);
 
 const Post = mongoose.model('Post', postSchema);
 const User = mongoose.model('User', userSchema);
+
+// const storage = multer.diskStorage({
+// 	destination: function(req, file, cb) {
+// 		cb(null, '/uploads')
+// 	}, 
+// 	filename: function(req, file, cb) {
+// 		cb(null, file.fieldname + '-' + Date.now());
+// 	}
+// });
+// const upload = multer({storage: storage});
 
 passport.use(new GoogleStrategy({
 	clientID: process.env.GOOGLE_CLIENT_ID,
@@ -173,7 +188,7 @@ app.get('/compose', function (req, res) {
 	}
 });
 
-app.get('/edit/:title', function (req, res) {
+app.get('/edit/posts/:title', function (req, res) {
 	if (req.isAuthenticated()) {
 		Post.findOne({ title: req.params.title })
 			.populate('author')
@@ -182,7 +197,25 @@ app.get('/edit/:title', function (req, res) {
 					console.log(error);
 				} else {
 					if (post) {
-						res.render('edit', { post: post });
+						res.render('edit-posts', { post: post });
+					} else {
+						res.redirect('/dashboard');
+					}
+				}
+			});
+	}
+});
+
+app.get('/edit/drafts/:title', function (req, res) {
+	if (req.isAuthenticated()) {
+		Post.findOne({ title: req.params.title })
+			.populate('author')
+			.exec(function (error, post) {
+				if (error) {
+					console.log(error);
+				} else {
+					if (post) {
+						res.render('edit-drafts', { post: post });
 					} else {
 						res.redirect('/dashboard');
 					}
@@ -234,6 +267,24 @@ app.get('/dashboard', function (req, res) {
 	}
 });
 
+app.get('/settings', function (req, res) {
+	User.findOne({ _id: req.user.id }, function (error, user) {
+		if (error) {
+			console.log(error);
+		} else {
+			if (user) {
+				res.render('settings', { user: user });
+			} else {
+				res.redirect('/login');
+			}
+		}
+	});
+});
+
+app.get('/thank-you', function (req, res) {
+	res.render('thank-you');
+})
+
 app.post('/login', function (req, res) {
 	const user = new User({
 		username: req.body.username,
@@ -257,7 +308,7 @@ app.post('/login', function (req, res) {
 });
 
 app.post('/register', function (req, res) {
-	User.register({ username: req.body.username, displayName: req.body.name }, req.body.password, function (error, user) {
+	User.register({ username: req.body.username, displayName: req.body.name, avatar: 'user.png' }, req.body.password, function (error, user) {
 		if (error) {
 			console.log(error);
 		} else {
@@ -272,13 +323,15 @@ app.post('/register', function (req, res) {
 	});
 });
 
-app.post('/compose', function (req, res) {
+app.post('/compose', upload.single('compose'), function (req, res) {
 	// when user pressed publish (投稿する) button to publish posts
 	if (req.body.publish) {
 		const post = new Post({
 			title: req.body.title,
 			content: req.body.content,
 			author: req.user,
+			image: req.file ? req.file.filename : 'default-image.png',
+			created: new Date().toLocaleDateString('ko-KR'),
 			published: true
 		});
 		post.save().then(function (post) {
@@ -292,12 +345,14 @@ app.post('/compose', function (req, res) {
 		}).catch(function (error) {
 			console.log(error);
 		});
-	// when user pressed save (保存する) button to save drafts
+		// when user pressed save (保存する) button to save drafts
 	} else if (req.body.save) {
 		const draft = new Post({
 			title: req.body.title,
 			content: req.body.content,
 			author: req.user,
+			image: req.file ? req.file.filename : 'default-image.png',
+			created: new Date().toLocaleDateString('ko-KR'),
 			published: false
 		});
 		draft.save().then(function (draft) {
@@ -314,37 +369,57 @@ app.post('/compose', function (req, res) {
 	}
 });
 
-app.post('/edit/:title', function (req, res) {
+app.post('/edit/posts/:title', upload.single('edit-posts'), function (req, res) {
+	Post.findOneAndUpdate({ title: req.params.title }, {
+		title: req.body.title,
+		content: req.body.content,
+		image: req.file ? req.file.filename : 'default-image.png',
+		created: new Date().toLocaleDateString('ko-KR'),
+		published: true
+	}, function (error) {
+		if (error) {
+			console.log(error);
+		} else {
+			res.redirect('/');
+		}
+	});
+});
+
+app.post('/edit/drafts/:title', upload.single('edit-drafts'), function (req, res) {
 	if (req.body.publish) {
 		Post.findOneAndUpdate({ title: req.params.title }, {
 			title: req.body.title,
 			content: req.body.content,
+			image: req.file ? req.file.filename : 'default-image.png',
+			created: new Date().toLocaleDateString('ko-KR'),
 			published: true
 		}).then(function (post) {
-				User.findOneAndUpdate({ _id: req.user.id }, { 
-					$pull: { drafts: post.id },
-					$push: { posts: post.id } 
-				})
-				.then(function() {
+			User.findOneAndUpdate({ _id: req.user.id }, {
+				$pull: { drafts: post.id },
+				$push: { posts: post.id }
+			})
+				.then(function () {
 					res.redirect('/dashboard');
-				})
-			}).catch(function (error) {
-				console.log(error);
-			});
-
- } else if (req.body.save) {
-	Post.findOneAndUpdate({ title: req.params.title }, {
-		title: req.body.title,
-		content: req.body.content,
-		published: false
-	}, function (error, post) {
-		if (error) {
+				});
+		}).catch(function (error) {
 			console.log(error);
-		} else {
-			res.redirect('/dashboard');
-		}
-	});
-}
+		});
+
+	} else if (req.body.save) {
+		Post.findOneAndUpdate({ title: req.params.title }, {
+			title: req.body.title,
+			content: req.body.content,
+			image: req.file ? req.file.filename : 'default-image.png',
+			created: new Date().toLocaleDateString('ko-KR'),
+			published: false
+		}, function (error, post) {
+			if (error) {
+				console.log(error);
+			} else {
+				res.redirect('/dashboard');
+			}
+		});
+	}
 });
 
 app.post('/search', function (req, res) {
@@ -361,34 +436,100 @@ app.post('/search', function (req, res) {
 	});
 });
 
-app.delete('/delete/posts/:title', function(req, res) {
-	Post.findOneAndDelete({title: req.params.title}).
-		then(function(post) {
-			User.findOneAndUpdate({_id: req.user.id}, {$pull: {posts: post.id}})
-				.then(function() {
-					res.json({success: true});
+app.post('/settings', upload.single('image'), function (req, res) {
+	User.findOneAndUpdate({ _id: req.user.id }, { avatar: req.file.filename }, function (error, user) {
+		if (error) {
+			console.log(error);
+		} else {
+			if (user) {
+				res.redirect('/settings');
+			}
+		}
+	});
+});
+
+app.patch('/settings', function (req, res) {
+	if (req.body.displayName) {
+		User.findOneAndUpdate({ _id: req.user.id }, { displayName: req.body.displayName })
+			.then(function () {
+				res.json({ success: true });
+			})
+			.catch(function (error) {
+				console.log(error);
+				res.json({ error: error });
+			});
+	}
+
+	if (req.body.newPassword) {
+		User.findOneAndUpdate({
+			$and: [{
+				_id: req.user.id,
+				password: req.body.currentPassword
+			}]
+		}, { password: req.body.newPassword }, function (error, user) {
+			if (error) {
+				console.log(error);
+			} else {
+				if (user) {
+					console.log(user);
+				} else {
+					console.log('no user matched')
+				}
+			}
+		})
+			.then(function () {
+				res.json({ success: true });
+			})
+			.catch(function (error) {
+				console.log(error);
+				res.json({ error: error });
+			});
+	}
+});
+
+app.delete('/delete/users', function (req, res) {
+	User.findOneAndDelete({ _id: req.user.id }, function (error) {
+		if (error) {
+			console.log(error);
+		}
+	})
+		.then(function () {
+			res.json({ success: true });
+		})
+		.catch(function (error) {
+			console.log(error);
+			res.json({ error: error });
+		});
+});
+
+app.delete('/delete/posts/:title', function (req, res) {
+	Post.findOneAndDelete({ title: req.params.title })
+		.then(function (post) {
+			User.findOneAndUpdate({ _id: req.user.id }, { $pull: { posts: post.id } })
+				.then(function () {
+					res.json({ success: true });
 				})
-				.catch(function(error) {
+				.catch(function (error) {
 					console.log(error);
-					res.json({error: error});
+					res.json({ error: error });
 				})
-		}).catch(function(error) {
+		}).catch(function (error) {
 			console.log(error);
 		});
 });
 
-app.delete('/delete/drafts/:title', function(req, res) {
-	Post.findOneAndDelete({title: req.params.title}).
-		then(function(draft) {
-			User.findOneAndUpdate({_id: req.user.id}, {$pull: {drafts: draft.id}})
-				.then(function() {
-					res.json({success: true});
+app.delete('/delete/drafts/:title', function (req, res) {
+	Post.findOneAndDelete({ title: req.params.title })
+		.then(function (draft) {
+			User.findOneAndUpdate({ _id: req.user.id }, { $pull: { drafts: draft.id } })
+				.then(function () {
+					res.json({ success: true });
 				})
-				.catch(function(error) {
+				.catch(function (error) {
 					console.log(error);
-					res.json({error: error});
+					res.json({ error: error });
 				})
-		}).catch(function(error) {
+		}).catch(function (error) {
 			console.log(error);
 		});
 });

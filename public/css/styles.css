@@ -16,7 +16,6 @@ body {
 
 #wrapper {
 	height: 100vh;
-	/* padding-top: 70px; */
 	background: rgb(245, 245, 245);
 }
 
@@ -32,6 +31,15 @@ a {
 a:hover {
 	text-decoration: none;
 	color: rgb(214, 230, 242);
+}
+
+.circled-image {
+	width: 40px;
+	height: 40px;
+	vertical-align: top;
+	position: relative;
+	overflow: hidden;
+	border-radius: 50%;
 }
 
 /* Header */
@@ -68,40 +76,134 @@ header nav {
 /* Main */
 main {
 	display: block;
-	padding: 0 5%;
+	padding: 0 5% 30px;
+	z-index: 2;
+	background: rgb(245, 245, 245);
 }
 
-main .author {
+main p {
+	margin-bottom: 0;
+}
+
+/* Home */
+.home .author {
 	color: rgb(83, 85, 129);
 } 
 
-main .author:hover{
-	text-decoration: none;
+.home .author:hover{
 	color: rgb(214, 230, 242);
 } 
 
-main .btn-social_icon:before {
+.home .btn-social_icon:before {
 	position: absolute;
 	top: -8px;
 	left: 6px;
 }
 
-main section div .card-body {
+.home section div .card-body {
 	padding: 0.5rem;
 }
 
-/* #new-post {
-	width: 30%;
+.home .media a {
+	width: 40px;
+}
+
+.home .media-body p {
+	color: rgb(83, 85, 129);
+	font-size: 1.3rem;
+}
+
+/* About */
+.about h1 {
+	font-size: 2.5rem;
+	font-weight: 600;
+	color: rgb(48, 52, 129);
+}
+
+/* Post */
+.post h1 {
+	font-size: 2.8rem;
+	font-weight: 600;
+	color: rgb(48, 52, 129);
+}
+
+.post .image-container img {
+	width: 100%;
+	max-width: 600px;
+	max-height: 350px;
 	display: block;
-	position: relative;
-	left: 5%;
-} */
+	margin: 0 auto;
+}
+
+.post .media {
+	margin-right: 5%;
+	align-items: flex-end;
+	justify-content: flex-end;
+}
+
+.post .media a p {
+	font-size: 2.0rem;
+	color: rgb(33, 37, 41);
+}
+
+.post .media a p:hover {
+	color: rgb(214, 230, 242);
+}
+
+.post .media div>p {
+	font-size: 1.3rem;
+	color: rgb(150, 150, 150);
+}
+
+/* Author */
+.author .media {
+	align-items: flex-end;
+}
+
+.author .card-body p:first-of-type {
+	color: rgb(83, 85, 129);
+	font-size: 1.3rem;
+	text-align: right;
+}
+
+/* Login */
+.login i {
+	line-height: 1.3 !important;
+}
+
+/* Register */
+.register i{
+	line-height: 1.3 !important;
+}
+
+/* Compose */
+.compose .input-group .custom-file-label {
+	color: rgb(150, 150, 150);
+	font-size: 1.5rem;
+}
+
+/* Edit */
+.edit .input-group .custom-file-label {
+	color: rgb(150, 150, 150);
+	font-size: 1.5rem;
+}
+
+/* Settings */
+.settings .avatar {
+	width: 100px;
+	height: 100px;
+}
+
+.settings .custom-file-label {
+	color: rgb(150, 150, 150);
+	font-size: 1.5rem;
+}
 
 /* Footer */
 footer {
 	height: 50px;
 	width: 100vw;
-	position: absolute;
+	position: fixed;
 	bottom: 0;
 	background-color: rgb(214, 230, 242);
 }

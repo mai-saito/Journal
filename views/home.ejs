@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
 
-	<main>
+	<main class="home">
 		<section class="row ml-0">
 			<% posts.forEach(function(post) { %>
 				<% if (post.published === true) { %>
@@ -17,10 +17,15 @@
 								</p>
 								<a href="/posts/<%= post.title %>" class="btn btn-outline-primary">記事を読む</a>
 								<div class="media mt-3">
-									<img src="#" alt="" class="mr-3">
-									<a href="/authors/<%= post.author.displayName %>" class="card-link media-body author">
-										<%= post.author.displayName %>
+									<a href="/authors/<%= post.author.displayName %>" class="card-link mr-3">
+										<img src="uploads/<%=post.author.avatar %>" alt="avatar" class="circled-image">
 									</a>
+									<div class="media-body">
+										<a href="/authors/<%= post.author.displayName %>" class="card-link author">
+											<%= post.author.displayName %>
+										</a>
+										<p class="mb-0"><%= post.created %></p>
+									</div>
 								</div>
 							</div>
 						</div>

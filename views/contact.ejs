@@ -1,4 +1,22 @@
 <%- include('partials/header') %>
 
+	<main class="contact">
+		<h1>お問合わせ</h1>
+		<p class="mb-5">
+			気づいたことやご意見をお寄せください。<br>
+			Journalをさらにより良いものにするためにご意見をお待ちしております。
+		</p>
+	  <form action="#" method="POST">
+			<div class="form-group">
+				<label for="title">件名</label>
+				<input type="text" id="title" name="title" class="form-control">
+			</div>
+			<div class="form-group">
+				<label for="content">本文</label>
+				<textarea name="content" id="content" class="form-control" cols="30" rows="10"></textarea>
+			</div>
+			<button type="submit" class="btn btn-primary btn-lg">送信する</button>
+		</form>
+	</main>
 
 <%- include('partials/footer') %>

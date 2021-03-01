@@ -1,0 +1,157 @@
+<%- include('partials/dashboard-header') %>
+
+	<main class="settings">
+		<div class="d-flex align-items-center mb-5">
+			<h1 class="mr-3"><img src="uploads/<%= user.avatar %>" class="img-thumbnail circled-image avatar" alt="avatar"></h1>
+			<h1><%= user.displayName %>さんのページ	</h1>
+		</div>
+		<ul id="settings-tab" class="nav nav-tabs" role="tablist">
+			<li class="nav-item"><a href="#displayName" id="displayName" class="nav-link active" data-toggle="tab" role="tab"
+					onclick="changeTabs(event)">名前の変更</a></li>
+			<li class="nav-item"><a href="#password" id="password" class="nav-link" data-toggle="tab" role="tab"
+					onclick="changeTabs(event)">パスワードの変更</a>
+			</li>
+			<li class="nav-item"><a href="#image" id="image" class="nav-link" data-toggle="tab" role="tab"
+					onclick="changeTabs(event)">プロフィール写真の登録・変更</a>
+			</li>
+			<li class="nav-item"><a href="#delete" id="delete" class="nav-link" data-toggle="tab" role="tab"
+					onclick="changeTabs(event)">退会</a></li>
+		</ul>
+		<div class="tab-content" id="tab-contents">
+			<form action="/settings" method="POST" class="tab-pane show active mt-3" id="displayName" role="tabpanel">
+				<div class="form-group">
+					<label for="new-displayName">あたらしい名前</label>
+					<input type="text" id="new-displayName" class="form-control" placeholder="あたらしい名前を入力してください">
+				</div>
+				<button type="submit" name="displayName" class="update btn btn-primary">変更</button>
+			</form>
+			<form action="/settings" method="POST" class="tab-pane mt-3" id="password" role="tabpanel">
+				<div class="form-group mb-5">
+					<label for="currentPassword">現在のパスワード</label>
+					<input type="text" id="current-password" class="form-control" placeholder="現在のパスワードを入力してください">
+				</div>
+				<div class="form-group">
+					<label for="new-password">あたらしいパスワード</label>
+					<input type="text" id="new-password1" class="form-control mb-1" placeholder="あたらしいパスワードを入力してください">
+					<input type="text" id="new-password2" class="form-control" placeholder="もう一度あたらしいパスワードを入力してください">
+				</div>
+				<button type="submit" name="password" class="update btn btn-primary">変更</button>
+			</form>
+			<form action="/settings" method="POST" class="tab-pane mt-3" id="image" role="tabpanel"
+				enctype="multipart/form-data">
+					<div class="custom-file">
+						<input type="file" name="image" id="new-image" class="custom-file-input" onchange="{handleChange(event)}">
+						<label for="new-image" class="custom-file-label" data-browse="ファイルを探す">写真をアップロードしてください</label>
+					</div>
+				<button type="submit" class="btn btn-primary">アップロードする</button>
+			</form>
+			<form action="/delete/users" method="POST" class="tab-pane mt-3" id="delete" role="tabpanel">
+				<p>本当に退会されますか・・・？</p>
+				<p>
+					※アカウントの停止後も作成いただいた記事はサイト内で閲覧可能です。<br>
+					※記事の削除もご希望の場合は、退会前にダッシュボード画面で記事の削除をお願いいたします。
+				</p>
+				<button type="submit" name="delete" class="delete btn btn-danger" value="true">退会する</button>
+			</form>
+		</div>
+		</form>
+	</main>
+	<footer>
+		<section>
+			<a href="#"><i class="fab fa-github"></i></a>
+			<a href="#"><i class="fab fa-linkedin-in"></i></a>
+		</section>
+	</footer>
+	</div>
+	<script>
+		const displayName = document.querySelector('#new-displayName');
+		const currentPassword = document.querySelector('#current-password');
+		const newPassword1 = document.querySelector('#new-password1');
+		const newPassword2 = document.querySelector('#new-password2');
+		const tabs = document.querySelectorAll('#tab-contents form');
+		const preview = document.querySelector('#preview');
+
+		function changeTabs(event) {
+			let tabId = event.target.id;
+
+			tabs.forEach(function (tab) {
+				tab.classList.remove('show', 'active');
+
+				if (tab.id === tabId) {
+					tab.classList.add('show', 'active');
+				}
+			});
+		}
+
+		function handleChange(event) {
+			const fileName = document.querySelector('#new-image').files[0].name;
+			const nextSibling = event.target.nextElementSibling;
+			nextSibling.innerText = fileName;
+		}
+
+		$(function () {
+			$('.update').on('click', function (event) {
+				event.preventDefault();
+
+				if (event.target.name === 'displayName') {
+					$.ajax({
+						type: 'PATCH',
+						url: '/settings',
+						data: {
+							displayName: displayName.value
+						},
+						success: function () {
+							window.location.reload();
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				}
+
+				if (event.target.name === 'password') {
+					console.log('if')
+					if (newPassword1.value !== newPassword2.value) {
+						console.log('new password does not match');
+						currentPassword.value = '';
+						newPassword1.value = '';
+						newPassword2.value = '';
+						return false;
+					}
+					$.ajax({
+						type: 'PATCH',
+						url: '/settings',
+						data: {
+							currentPassword: currentPassword.value,
+							newPassword: newPassword1.value
+						},
+						success: function () {
+							window.location.reload();
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				};
+			});
+		});
+
+		$(function () {
+			$('.delete').on('click', function (event) {
+				event.preventDefault();
+				$.ajax({
+					type: 'DELETE',
+					url: '/delete/users',
+					success: function () {
+						window.location = '/thank-you'
+					},
+					error: function (error) {
+						console.log(error);
+					}
+				});
+			});
+		});
+	</script>
+	</body>
+
+	</html>

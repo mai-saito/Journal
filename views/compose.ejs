@@ -1,6 +1,6 @@
 <%- include('partials/dashboard-header') %>
-		<main>
-			<form action="/compose" method="POST" class="col-sm-10">
+		<main class="compose">
+			<form action="/compose" method="POST" enctype="multipart/form-data" class="col-sm-10">
 				<div class="form-group">
 					<label for="title">タイトル</label>
 					<input type="text" id="title" name="title" class="form-control" >
@@ -9,9 +9,30 @@
 					<label for="content">記事を書く</label>
 					<textarea name="content" id="content" cols="30" rows="30" class="form-control"></textarea>
 				</div>
-				<button type="submit" class="btn btn-lg btn-primary" name="publish" value="publish">投稿する</button>
-				<button type="submit" id="draft-button" class="btn btn-lg btn-secondary" name="save" value="save">保存する</button>
+				<div class="input-group mb-3">
+					<div class="custom-file">
+						<input type="file" name="compose" id="compose-image" class="custom-file-input" onchange="{handleChange(event)}">
+						<label for="compose-image" class="custom-file-label" data-browse="検索">記事のアイキャッチ画像を選んでください</label>
+					</div>
+				</div>
+					<button type="submit" class="btn btn-lg btn-primary" name="publish" value="publish">投稿する</button>
+					<button type="submit" id="draft-button" class="btn btn-lg btn-secondary" name="save" value="save">保存する</button>
 			</form>
 		</main>
-
-<%- include('partials/footer') %>
+		<footer>
+			<section>
+				<a href="#"><i class="fab fa-github"></i></a>
+				<a href="#"><i class="fab fa-linkedin-in"></i></a>
+			</section>
+		</footer>
+		</div>
+		<script>
+			function handleChange(event) {
+				const fileName = document.querySelector('#compose-image').files[0].name;
+				const nextSibling = event.target.nextElementSibling;
+				nextSibling.innerText = fileName;
+			}
+		</script>
+		</body>
+	
+		</html>
