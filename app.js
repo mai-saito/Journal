@@ -26,7 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('view engine', 'ejs');
 
-mongoose.connect('mongodb://localhost:27017/journalDB', {
+mongoose.connect('mongodb+srv://' + process.env.USERNAME + ':' + process.env.PASSWORD + '@journaldb.m30cu.mongodb.net/journalDB', {
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 });
@@ -534,6 +534,10 @@ app.delete('/delete/drafts/:title', function (req, res) {
 		});
 });
 
-app.listen(3000, function () {
-	console.log('Successfully listening to port 3000');
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 3000;
+}
+app.listen(port, function () {
+	console.log('Server has started successfully.');
 });
