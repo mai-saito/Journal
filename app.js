@@ -80,7 +80,7 @@ const User = mongoose.model('User', userSchema);
 passport.use(new GoogleStrategy({
 	clientID: process.env.GOOGLE_CLIENT_ID,
 	clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-	callbackURL: 'http://localhost:3000/auth/google/journal',
+	callbackURL: 'https://still-chamber-42596.herokuapp.com/auth/google/journal',
 	userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
 },
 	function (accessToken, refreshToken, profile, cb) {
@@ -98,7 +98,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
 	clientID: process.env.FACEBOOK_APP_ID,
 	clientSecret: process.env.FACEBOOK_APP_SECRET,
-	callbackURL: 'http://localhost:3000/auth/facebook/journal',
+	callbackURL: 'https://still-chamber-42596.herokuapp.com/auth/facebook/journal',
 	profileFields: ['id', 'displayName', 'email']
 },
 	function (accessToken, refreshToken, profile, cb) {
