@@ -45,11 +45,10 @@
 					</div>
 				<button type="submit" class="btn btn-primary">アップロードする</button>
 			</form>
-			<form action="/delete/users" method="POST" class="tab-pane mt-3" id="delete" role="tabpanel">
-				<p>本当に退会されますか・・・？</p>
+			<form action="/delete/users/" method="POST" class="tab-pane mt-3" id="delete" role="tabpanel">
 				<p>
-					※アカウントの停止後も作成いただいた記事はサイト内で閲覧可能です。<br>
-					※記事の削除もご希望の場合は、退会前にダッシュボード画面で記事の削除をお願いいたします。
+					アカウントを停止されると、今まで書いた記事も消えてしまいます。<br>
+					本当に退会されますか・・・？
 				</p>
 				<button type="submit" name="delete" class="delete btn btn-danger" value="true">退会する</button>
 			</form>

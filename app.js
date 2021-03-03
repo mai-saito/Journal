@@ -488,18 +488,24 @@ app.patch('/settings', function (req, res) {
 });
 
 app.delete('/delete/users', function (req, res) {
-	User.findOneAndDelete({ _id: req.user.id }, function (error) {
-		if (error) {
-			console.log(error);
-		}
-	})
-		.then(function () {
-			res.json({ success: true });
+	Post.deleteMany({author: req.user.id})
+	.then(function() {
+		User.findOneAndDelete({ _id: req.user.id }, function (error) {
+			if (error) {
+				console.log(error);
+			}
 		})
-		.catch(function (error) {
-			console.log(error);
-			res.json({ error: error });
-		});
+			.then(function () {
+				res.json({ success: true });
+			})
+			.catch(function (error) {
+				console.log(error);
+				res.json({ error: error });
+			});
+	})
+	.catch(function(error) {
+		console.log(error);
+	});
 });
 
 app.delete('/delete/posts/:title', function (req, res) {
